@@ -11,6 +11,10 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Order persisted in the {@code orders} table and sent as a Kafka event payload.
+ * Its database-generated identifier is used as the Kafka record key.
+ */
 @Entity
 @Table(name = "orders")
 @Getter
@@ -29,6 +33,16 @@ public class Order {
     private String status;
     private LocalDateTime createdAt;
 
+    /**
+     * Creates an order whose identifier will be assigned during persistence.
+     *
+     * @param productCode code identifying the ordered product
+     * @param productName name of the ordered product
+     * @param quantity number of items ordered
+     * @param price price supplied for the order
+     * @param status initial order status
+     * @param createdAt local date and time of order creation
+     */
     public Order(String productCode, String productName, Integer quantity,
                  BigDecimal price, String status, LocalDateTime createdAt) {
         this.productCode = productCode;

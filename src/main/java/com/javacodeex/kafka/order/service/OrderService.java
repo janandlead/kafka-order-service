@@ -11,12 +11,24 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Coordinates order persistence and asynchronous Kafka publication.
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderKafkaProducer orderKafkaProducer;
 
+    /**
+     * Saves an order with status {@code CREATED} and the current local timestamp,
+     * then initiates publication before the database transaction completes.
+     * Database persistence and Kafka delivery are not atomic: an asynchronous
+     * send failure does not roll back the database transaction.
+     *
+     * @param request validated product, quantity, and price details
+     * @return details of the saved order, without waiting for Kafka acknowledgment
+     */
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
         Order order = new Order(request.getProductCode(), request.getProductName(),
